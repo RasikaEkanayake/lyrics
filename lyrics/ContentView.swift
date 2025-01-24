@@ -1,21 +1,35 @@
-//
-//  ContentView.swift
-//  lyrics
-//
-//  Created by Rasika Ekanayaka on 2025-01-24.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @State private var showingLoginSheet = false
+    @State private var selectedTab = 0
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView(selection: $selectedTab) {
+            NavigationStack {
+                PopularSongsView()
+            }
+            .tabItem {
+                Label("Popular", systemImage: "music.note")
+            }
+            .tag(0)
+            
+            NavigationStack {
+                SearchView()
+            }
+            .tabItem {
+                Label("Search", systemImage: "magnifyingglass")
+            }
+            .tag(1)
+            
+            NavigationStack {
+                FavoritesView()
+            }
+            .tabItem {
+                Label("Favorites", systemImage: "heart")
+            }
+            .tag(2)
         }
-        .padding()
     }
 }
 

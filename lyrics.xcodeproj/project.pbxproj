@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		152B21172D43427600242E10 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 152B21162D43427600242E10 /* GoogleSignIn */; };
+		152B211B2D4342D800242E10 /* MySQLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 152B211A2D4342D800242E10 /* MySQLKit */; };
+		152B21202D43451900242E10 /* MySQLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 152B211F2D43451900242E10 /* MySQLKit */; };
+		152B21FF2D43627000242E10 /* MySQLKit in Frameworks */ = {isa = PBXBuildFile; productRef = 152B21FE2D43627000242E10 /* MySQLKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		152B20D62D433AAE00242E10 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,9 +36,22 @@
 		152B20DF2D433AAE00242E10 /* lyricsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = lyricsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		15B71FB12D43B8BB004D9D16 /* Exceptions for "lyrics" folder in "lyrics" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 152B20C42D433AAC00242E10 /* lyrics */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		152B20C72D433AAC00242E10 /* lyrics */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				15B71FB12D43B8BB004D9D16 /* Exceptions for "lyrics" folder in "lyrics" target */,
+			);
 			path = lyrics;
 			sourceTree = "<group>";
 		};
@@ -52,6 +72,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				152B21FF2D43627000242E10 /* MySQLKit in Frameworks */,
+				152B21172D43427600242E10 /* GoogleSignIn in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,6 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				152B211B2D4342D800242E10 /* MySQLKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,6 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				152B21202D43451900242E10 /* MySQLKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +136,8 @@
 			);
 			name = lyrics;
 			packageProductDependencies = (
+				152B21162D43427600242E10 /* GoogleSignIn */,
+				152B21FE2D43627000242E10 /* MySQLKit */,
 			);
 			productName = lyrics;
 			productReference = 152B20C52D433AAC00242E10 /* lyrics.app */;
@@ -135,6 +161,7 @@
 			);
 			name = lyricsTests;
 			packageProductDependencies = (
+				152B211A2D4342D800242E10 /* MySQLKit */,
 			);
 			productName = lyricsTests;
 			productReference = 152B20D52D433AAE00242E10 /* lyricsTests.xctest */;
@@ -158,6 +185,7 @@
 			);
 			name = lyricsUITests;
 			packageProductDependencies = (
+				152B211F2D43451900242E10 /* MySQLKit */,
 			);
 			productName = lyricsUITests;
 			productReference = 152B20DF2D433AAE00242E10 /* lyricsUITests.xctest */;
@@ -195,6 +223,11 @@
 			);
 			mainGroup = 152B20BC2D433AAC00242E10;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				152B21042D43410500242E10 /* XCRemoteSwiftPackageReference "mysql-kit" */,
+				152B21152D43427600242E10 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				152B21502D4346A900242E10 /* XCRemoteSwiftPackageReference "Perfect-MySQL" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 152B20C62D433AAC00242E10 /* Products */;
 			projectDirPath = "";
@@ -399,10 +432,10 @@
 				DEVELOPMENT_TEAM = FJV39U4DZB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = lyrics/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -413,7 +446,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -428,10 +461,10 @@
 				DEVELOPMENT_TEAM = FJV39U4DZB;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = lyrics/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -442,7 +475,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -558,6 +591,56 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		152B21042D43410500242E10 /* XCRemoteSwiftPackageReference "mysql-kit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/vapor/mysql-kit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.9.0;
+			};
+		};
+		152B21152D43427600242E10 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		152B21502D4346A900242E10 /* XCRemoteSwiftPackageReference "Perfect-MySQL" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PerfectlySoft/Perfect-MySQL.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		152B21162D43427600242E10 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 152B21152D43427600242E10 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		152B211A2D4342D800242E10 /* MySQLKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 152B21042D43410500242E10 /* XCRemoteSwiftPackageReference "mysql-kit" */;
+			productName = MySQLKit;
+		};
+		152B211F2D43451900242E10 /* MySQLKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 152B21042D43410500242E10 /* XCRemoteSwiftPackageReference "mysql-kit" */;
+			productName = MySQLKit;
+		};
+		152B21FE2D43627000242E10 /* MySQLKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 152B21042D43410500242E10 /* XCRemoteSwiftPackageReference "mysql-kit" */;
+			productName = MySQLKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 152B20BD2D433AAC00242E10 /* Project object */;
 }
