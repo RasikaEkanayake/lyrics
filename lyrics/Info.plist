@@ -27,5 +27,14 @@
 			<string>UINewsstandBindingTypeMagazine</string>
 		</dict>
 	</dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need microphone access to identify songs</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>spotify</string>
+		<string>youtube</string>
+		<string>youtu.be</string>
+		<string>youtube-nocookie</string>
+	</array>
 </dict>
 </plist>

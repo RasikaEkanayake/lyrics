@@ -16,8 +16,19 @@ struct Song: Identifiable, Codable {
         case updatedAt = "updated_at"
     }
     
-    // Add computed property for preview
     var previewText: String {
         String(lyrics.prefix(100)) + "..."
+    }
+    
+    var formattedViews: String {
+        if let viewCount = Int(views) {
+            if viewCount >= 1000 {
+                let kViews = Double(viewCount) / 1000.0
+                return String(format: "%.2fk views", kViews)
+            } else {
+                return "\(viewCount) views"
+            }
+        }
+        return "0 views"
     }
 } 

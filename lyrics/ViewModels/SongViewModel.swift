@@ -3,7 +3,7 @@ import SwiftUI
 
 @MainActor
 class SongViewModel: ObservableObject {
-    static let shared = SongViewModel() // Add singleton instance
+    static let shared = SongViewModel()
     
     @Published var popularSongs: [Song] = []
     @Published var searchResults: [Song] = []
@@ -14,7 +14,7 @@ class SongViewModel: ObservableObject {
     private let apiURL = "https://devlk.com/lyricsv1.php"
     
     init() {
-        loadFavorites() // Only load favorites during init
+        loadFavorites()
     }
     
     private func loadFavorites() {
@@ -27,7 +27,6 @@ class SongViewModel: ObservableObject {
     private func saveFavorites() {
         if let data = try? JSONEncoder().encode(favoriteSongs) {
             UserDefaults.standard.set(data, forKey: favoritesKey)
-            UserDefaults.standard.synchronize() // Force immediate save
         }
     }
     
@@ -38,7 +37,7 @@ class SongViewModel: ObservableObject {
             } else {
                 favoriteSongs.insert(song.id)
             }
-            saveFavorites() // Save immediately
+            saveFavorites()
         }
     }
     
@@ -50,39 +49,7 @@ class SongViewModel: ObservableObject {
         popularSongs.filter { favoriteSongs.contains($0.id) }
     }
     
-    // Load cached songs if available
-    private func loadCachedSongs() {
-        if let data = UserDefaults.standard.data(forKey: "cachedSongs"),
-           let songs = try? JSONDecoder().decode([Song].self, from: data) {
-            self.popularSongs = songs
-        }
-    }
-    
-    // Cache songs for faster subsequent launches
-    private func cacheSongs(_ songs: [Song]) {
-        if let data = try? JSONEncoder().encode(songs) {
-            UserDefaults.standard.set(data, forKey: "cachedSongs")
-        }
-    }
-    
-    // Add computed property for top 20 songs
-    var topSongs: [Song] {
-        popularSongs
-            .sorted { 
-                // Convert views string to Int for comparison
-                let views1 = Int($0.views) ?? 0
-                let views2 = Int($1.views) ?? 0
-                return views2 < views1 // Descending order
-            }
-            .prefix(20) // Take only top 20
-            .map { $0 }
-    }
-    
     func fetchPopularSongs() async {
-        if popularSongs.isEmpty {
-            loadCachedSongs()
-        }
-        
         isLoading = true
         
         do {
@@ -90,16 +57,26 @@ class SongViewModel: ObservableObject {
                 throw URLError(.badURL)
             }
             
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let allSongs = try JSONDecoder().decode([Song].self, from: data)
+            let (data, response) = try await URLSession.shared.data(from: url)
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print("API Status Code: \(httpResponse.statusCode)")
+            }
+            
+            // Print the received JSON for debugging
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("Received JSON:", jsonString)
+            }
+            
+            let decoder = JSONDecoder()
+            let allSongs = try decoder.decode([Song].self, from: data)
             
             await MainActor.run {
                 self.popularSongs = allSongs
                 self.isLoading = false
-                self.cacheSongs(allSongs)
             }
         } catch {
-            print("Error fetching songs: \(error)")
+            print("Error fetching songs: \(error.localizedDescription)")
             await MainActor.run {
                 self.isLoading = false
             }
@@ -117,8 +94,36 @@ class SongViewModel: ObservableObject {
         }
     }
     
-    @MainActor
-    func refreshSongs() async {
-        await fetchPopularSongs()
+    func openInSpotify(song: Song) {
+        let query = "\(song.title) \(song.artist)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        // Try to open Spotify app first
+        if let spotifyURL = URL(string: "spotify://search/\(query)"),
+           UIApplication.shared.canOpenURL(spotifyURL) {
+            UIApplication.shared.open(spotifyURL)
+        } else {
+            // Fallback to web version
+            if let webURL = URL(string: "https://open.spotify.com/search/\(query)") {
+                UIApplication.shared.open(webURL)
+            }
+        }
+    }
+    
+    func openInYouTube(song: Song) {
+        let query = "\(song.title) \(song.artist)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        
+        // Try to open YouTube app first
+        if let youtubeURL = URL(string: "youtu.be://\(query)"),
+           UIApplication.shared.canOpenURL(youtubeURL) {
+            UIApplication.shared.open(youtubeURL)
+        } else if let youtubeURL = URL(string: "youtube://\(query)"),
+                  UIApplication.shared.canOpenURL(youtubeURL) {
+            UIApplication.shared.open(youtubeURL)
+        } else {
+            // Fallback to web version
+            if let webURL = URL(string: "https://www.youtube.com/results?search_query=\(query)") {
+                UIApplication.shared.open(webURL)
+            }
+        }
     }
 } 

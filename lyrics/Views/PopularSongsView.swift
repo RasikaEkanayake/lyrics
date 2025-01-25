@@ -2,57 +2,40 @@ import SwiftUI
 
 struct PopularSongsView: View {
     @StateObject private var viewModel = SongViewModel.shared
-    @State private var selectedSong: Song?
+    @State private var isRefreshing = false
     
-    // Use grid layout for visual content
+    // Two-column grid layout
     private let columns = [
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16)
     ]
     
+    // Sort songs by views in descending order
+    private var sortedSongs: [Song] {
+        viewModel.popularSongs.sorted { song1, song2 in
+            Int(song1.views) ?? 0 > Int(song2.views) ?? 0
+        }
+    }
+    
     var body: some View {
-        Group {
-            if viewModel.isLoading && viewModel.popularSongs.isEmpty {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if viewModel.popularSongs.isEmpty {
+        ScrollView {
+            if viewModel.popularSongs.isEmpty {
                 ContentUnavailableView(
                     "No Songs Available",
                     systemImage: "music.note",
-                    description: Text("Check back later for popular songs")
+                    description: Text("Pull to refresh to load songs")
                 )
             } else {
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(viewModel.topSongs) { song in
-                            SongCard(song: song, viewModel: viewModel)
-                                .onTapGesture {
-                                    selectedSong = song
-                                }
-                                // Make hit target at least 44x44
-                                .frame(minHeight: 44)
-                                // Add accessibility label
-                                .accessibilityLabel("\(song.title) by \(song.artist)")
-                        }
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach(sortedSongs) { song in
+                        SongCard(song: song)
                     }
-                    .padding(16)
                 }
+                .padding()
             }
         }
-        .navigationTitle("Top 20 Songs")
+        .navigationTitle("Popular Songs")
         .task {
-            if viewModel.popularSongs.isEmpty {
-                await viewModel.fetchPopularSongs()
-            }
-        }
-        // Present detail view as sheet for better UX
-        .sheet(item: $selectedSong) { song in
-            NavigationStack {
-                LyricDetailView(song: song)
-            }
-        }
-        // Support pull-to-refresh
-        .refreshable {
             await viewModel.fetchPopularSongs()
         }
     }
@@ -60,146 +43,81 @@ struct PopularSongsView: View {
 
 struct SongCard: View {
     let song: Song
-    @ObservedObject var viewModel: SongViewModel
-    @Environment(\.colorScheme) var colorScheme
-    @State private var isFavorite: Bool = false
-    
-    var formattedViews: String {
-        if let views = Int(song.views) {
-            if views >= 1000000 {
-                return String(format: "%.1fM views", Double(views) / 1000000)
-            } else if views >= 1000 {
-                return String(format: "%.1fK views", Double(views) / 1000)
-            } else {
-                return "\(views) views"
-            }
-        }
-        return "0 views"
-    }
+    @StateObject private var viewModel = SongViewModel.shared
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(song.title)
-                    .font(.headline)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.9)
-                
-                Spacer()
-                
-                Button(action: {
-                    isFavorite.toggle() // Immediate feedback
-                    viewModel.toggleFavorite(song: song)
-                }) {
-                    Image(systemName: isFavorite ? "heart.fill" : "heart")
-                        .foregroundColor(.red)
-                        .scaleEffect(isFavorite ? 1.1 : 1.0)
-                        .animation(.spring(response: 0.3), value: isFavorite)
-                }
-            }
-            
-            Text(song.artist)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .lineLimit(1)
-            
-            Text(formattedViews)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(colorScheme == .dark ? Color(.systemGray6) : Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .shadow(radius: 2, y: 1)
-        .onAppear {
-            isFavorite = viewModel.isFavorite(song: song)
-        }
-    }
-}
-
-struct LyricDetailView: View {
-    @Environment(\.dismiss) private var dismiss
-    let song: Song
-    @State private var showShareSheet = false
-    @State private var showCopiedAlert = false
-    
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                Text(song.title)
-                    .font(.title)
-                    .bold()
-                
-                Text(song.artist)
-                    .font(.title2)
-                    .foregroundColor(.secondary)
-                
-                Text(song.lyrics)
-                    .font(.body)
-                    .padding(.top)
-            }
-            .padding()
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 16) {
-                    // Copy button
-                    Button {
-                        UIPasteboard.general.string = """
-                            \(song.title)
-                            by \(song.artist)
-                            
-                            \(song.lyrics)
-                            """
-                        showCopiedAlert = true
-                    } label: {
-                        Image(systemName: "doc.on.doc")
-                            .font(.system(size: 16, weight: .medium))
+        NavigationLink(destination: LyricDetailView(song: song)) {
+            VStack(spacing: 0) {
+                Rectangle()
+                    .fill(Color(.systemGray6))
+                    .overlay {
+                        Image(systemName: "music.note")
+                            .font(.system(size: 40))
+                            .foregroundColor(.gray)
                     }
-                    .accessibilityLabel("Copy lyrics")
-                    
-                    // Share button
-                    Button {
-                        showShareSheet = true
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                            .font(.system(size: 16, weight: .medium))
+                    .aspectRatio(1, contentMode: .fit)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(alignment: .topTrailing) {
+                        Text(song.formattedViews)
+                            .font(.caption2)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Capsule())
+                            .padding(8)
                     }
-                    .accessibilityLabel("Share song")
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(song.title)
+                            .font(.headline)
+                            .lineLimit(1)
+                        
+                        Text(song.artist)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
                     
-                    // Done button
-                    Button("Done") {
-                        dismiss()
+                    HStack {
+                        Button {
+                            viewModel.openInSpotify(song: song)
+                        } label: {
+                            Image("spotify")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                        }
+                        
+                        Button {
+                            viewModel.openInYouTube(song: song)
+                        } label: {
+                            Image("youtube")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                        }
+                        
+                        Spacer()
+                        
+                        Button {
+                            withAnimation {
+                                viewModel.toggleFavorite(song: song)
+                            }
+                        } label: {
+                            Image(systemName: viewModel.isFavorite(song: song) ? "heart.fill" : "heart")
+                                .foregroundColor(.red)
+                        }
                     }
                 }
+                .padding(12)
             }
+            .background(Color(.systemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
         }
-        .sheet(isPresented: $showShareSheet) {
-            let shareText = """
-            \(song.title)
-            by \(song.artist)
-            
-            \(song.lyrics)
-            """
-            ShareSheet(items: [shareText])
-        }
-        .alert("Copied to Clipboard", isPresented: $showCopiedAlert) {
-            Button("OK", role: .cancel) {}
-        }
+        .buttonStyle(.plain)
     }
-}
-
-// Helper view for share sheet
-struct ShareSheet: UIViewControllerRepresentable {
-    let items: [Any]
-    
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
-    }
-    
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview {
